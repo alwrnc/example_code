@@ -1,0 +1,69 @@
+# This file defines all the rules for compilation
+
+EXTRA_INCLUDE = -I$(PROJECT)\CP\360\Hdr
+MV = mv
+
+
+depend.spi:
+    $(CC) -M $(CFLAGS) $(wildcard *.[c]) > $@
+	$(CC) -M $(CFLAGS) $(wildcard *.cpp) >> $@
+
+-include depend.spi
+
+
+
+
+clean:
+	- $(RM) *.o 
+	- $(RM) *.out 
+	- $(RM) *.a 
+cleanall   :
+	- $(RM) *.o 
+	- $(RM) vxWorks* 
+	- $(RM) bootrom* 
+	- $(RM) ctdt.c 
+	- $(RM) symTbl.c
+	- $(RM) depend.*
+
+.s.o :
+	@ $(RM) $@
+	$(CC) $(CFLAGS_AS) -c -o $@ $< 
+
+.c.o :
+	@ $(RM) $@
+	$(CC) $(CFLAGS) -c $<
+
+# Rules for making a library
+%.a :
+	@ $(RM) $@
+	$(LD) -X -N -r -o $@ $(OBJECTS)
+
+# rule for munchless C++ compiles
+.cpp.o :
+	@ $(RM) $@
+	$(CXX) $(C++FLAGS) -c $<
+
+.cxx.o :
+	@ $(RM) $@
+	$(CXX) $(C++FLAGS) -c $<
+
+# C++ compile and munch
+.cpp.out :
+	@ $(RM) $@
+	$(CXX) $(C++FLAGS) -c $<
+	@ $(RM) $@ ctdt.c
+	$(NM) $*.o | munch > ctdt.c
+	$(MAKE) CC_COMPILER="-traditional" ctdt.o
+	$(LD) $(LD_PARTIAL_FLAGS) -o $@ $*.o ctdt.o
+	@ $(RM) ctdt.c ctdt.o
+
+.cxx.out :
+	@ $(RM) $@
+	$(CXX) $(C++FLAGS) -c $<
+	@ $(RM) $@ ctdt.c
+	$(NM) $*.o | munch > ctdt.c
+	$(MAKE) CC_COMPILER="-traditional" ctdt.o
+	$(LD) $(LD_PARTIAL_FLAGS) -o $@ $*.o ctdt.o
+	@ $(RM) ctdt.c ctdt.o
+
+

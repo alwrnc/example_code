@@ -1,0 +1,11 @@
+
+
+Code snippets for popular real-time OS to manage perpherals on a SPI
+bus.
+
+Unlike the usual code examples for performing io operations over an
+SPI requires exclusive access to the bus for a read or write. The
+code presented allows io operations on a shared SPI bus to occur
+concurrently, taking advantage that most SPI device reads or writes
+are done via a series of subcommands.
+
